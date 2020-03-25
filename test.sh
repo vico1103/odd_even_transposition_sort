@@ -12,7 +12,7 @@ fi;
 check=$(echo "$@" | grep -E '^\-?[0-9]+$')
 
 	if [[ "$check" == '' ]]; then
-	  >&2 echo "Argumnt is not a number. Please try again ./test.sh 6"
+	  >&2 echo "Argument is not a number. Please try again ./test.sh 6"
     exit 251
 fi;
 
