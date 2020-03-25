@@ -53,16 +53,16 @@ int main(int argc, char **argv) {
     for (int j = 1; j <= halfCycles; j++) {
         // even processors
         if ((!(mpiInfo[0] % 2) || mpiInfo[0] == 0) && (mpiInfo[0] < oddLimit)) {
-            evenProcessorsSendReceive(mpiInfo, mpiStatus, actualValue);
+            processorsSendReceive(mpiInfo, mpiStatus, actualValue);
         } else if (mpiInfo[0] <= oddLimit) {
-            oddProcessorsSwap(mpiInfo, mpiStatus, neighbourValue, actualValue);
+            processorsSwap(mpiInfo, mpiStatus, neighbourValue, actualValue);
         }
 
         // odd processors
         if ((mpiInfo[0] % 2) && (mpiInfo[0] < evenLimit)) {
-            oddProcessorsSendReceive(mpiInfo, mpiStatus, actualValue);
+           processorsSendReceive(mpiInfo, mpiStatus, actualValue);
         } else if (mpiInfo[0] <= evenLimit && mpiInfo[0] != 0) {
-            evenProcessorsSwap(mpiInfo, mpiStatus, neighbourValue, actualValue);
+            processorsSwap(mpiInfo, mpiStatus, neighbourValue, actualValue);
         }
     }
 
@@ -90,7 +90,8 @@ void showConsumptionTime(double start) {
 #endif
 }
 
-void evenProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue) {
+// function for processors swap
+void processorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue) {
     MPI_Recv(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
 
     if (neighbourValue > actualValue) {
@@ -101,25 +102,8 @@ void evenProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbou
     }
 }
 
-void oddProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue) {
-    MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);
-    MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
-}
-
-// function for odd processors swap
-void oddProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue) {
-    MPI_Recv(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
-
-    if (neighbourValue > actualValue) {
-        MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD);
-        actualValue = neighbourValue;
-    } else {
-        MPI_Send(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD);
-    }
-}
-
-// function for even send and receive
-void evenProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue) {
+// function for processor send and receive
+void processorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue) {
     MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);
     MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
 }
@@ -190,7 +174,7 @@ void lastOrderAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValu
     for (int i = 1; i < mpiInfo[1]; i++) {
         if (mpiInfo[0] == i) MPI_Send(&value, 1, MPI_INT, ROOT_NODE, TAG_MPI, MPI_COMM_WORLD);
         if (mpiInfo[0] == ROOT_NODE) {
-            MPI_Recv(&nValue, 1, MPI_INT, i, TAG_MPI, MPI_COMM_WORLD, &status); //jsem 0 a prijimam
+            MPI_Recv(&nValue, 1, MPI_INT, i, TAG_MPI, MPI_COMM_WORLD, &status);
             orderedValues[i] = nValue;
         }
     }

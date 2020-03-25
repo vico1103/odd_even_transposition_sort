@@ -47,13 +47,9 @@ void showConsumptionTime(double start);
 
 double startMPITime();
 
-void evenProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue);
+void processorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue);
 
-void oddProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue);
-
-void oddProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue);
-
-void evenProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue);
+void processorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue);
 
 void lastOrderAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValue, int &value, double start);
 
