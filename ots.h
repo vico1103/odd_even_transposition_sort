@@ -55,6 +55,6 @@ void oddProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &ac
 
 void evenProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue);
 
-void lastOrderedAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValue, int &value, double start);
+void lastOrderAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValue, int &value, double start);
 
 #endif //ODD_EVEN_OTS_H

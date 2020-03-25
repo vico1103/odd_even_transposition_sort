@@ -18,8 +18,8 @@ fi;
 
 # build, create numbers and run
 mpic++ --prefix /usr/local/share/OpenMPI -o ots ots.cpp
-dd if=/dev/random bs=1 count=$numbers of=numbers
+dd if=/dev/random bs=1 count=$numbers of=numbers > /dev/null 2>&1
 mpirun -np $numbers ots numbers
 
 # remove files after run
-rm -f numbers ots
+rm -f numbers ots 

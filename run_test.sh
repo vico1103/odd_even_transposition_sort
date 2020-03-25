@@ -1,7 +1,11 @@
 #!/bin/bash
 
-for index in {1..12..1}
+for run_test in {1..250..1}
   do
-    tFile="con_time$index"
-    ./test.sh $index 2> $tFile
+    for index in {1..24..1}
+      do
+        >&2 printf "%s, %s, " $run_test $index
+        ./test.sh $index
+      done
   done
+

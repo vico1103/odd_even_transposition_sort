@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 
     int oddLimit = 2 * (mpiInfo[1] / 2) - 1;
     int evenLimit = 2 * ((mpiInfo[1] - 1) / 2);
-    int halfCycles = mpiInfo[1] / 2;
+    int halfCycles = (mpiInfo[1] %   2 == 0)? mpiInfo[1] / 2 : mpiInfo[1] / 2 +1 ;
 
     for (int j = 1; j <= halfCycles; j++) {
         // even processors
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    lastOrderedAndShowRootNode(mpiStatus, mpiInfo, neighbourValue, actualValue, start);
+    lastOrderAndShowRootNode(mpiStatus, mpiInfo, neighbourValue, actualValue, start);
 
     MPI_Finalize();
     return SUCCESS;
@@ -84,28 +84,26 @@ double startMPITime() {
 // function for show consumption time for algorithm
 void showConsumptionTime(double start) {
 #if SHOW_TIME
-    double end = MPI_Wtime();
-    cerr << "Consumption time: " << (end - start) << endl;
+    double time = MPI_Wtime() - start;  
+
+    cerr << time << endl;
 #endif
 }
 
 void evenProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbourValue, int &actualValue) {
-    MPI_Recv(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD,
-             &mpiStatus); //jsem sudy a prijimam
+    MPI_Recv(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
 
-    if (neighbourValue >
-        actualValue) {                                             //pokud je leveho sous cislo vetsi
-        MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD);       //poslu svoje
-        actualValue = neighbourValue;                                              //a vemu si jeho
+    if (neighbourValue > actualValue) {
+        MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD);
+        actualValue = neighbourValue;
     } else {
         MPI_Send(&neighbourValue, 1, MPI_INT, mpiInfo[0] - 1, TAG_MPI, MPI_COMM_WORLD);
     }
 }
 
 void oddProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue) {
-    MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);           //poslu sousedovi svoje cislo
-    MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);    //a cekam na nizsi
-
+    MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);
+    MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
 }
 
 // function for odd processors swap
@@ -122,19 +120,18 @@ void oddProcessorsSwap(const int *mpiInfo, MPI_Status &mpiStatus, int &neighbour
 
 // function for even send and receive
 void evenProcessorsSendReceive(const int *mpiInfo, MPI_Status &mpiStatus, int &actualValue) {
-    MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);          //poslu sousedovi svoje cislo
-    MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);   //a cekam na nizsi
+    MPI_Send(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD);
+    MPI_Recv(&actualValue, 1, MPI_INT, mpiInfo[0] + 1, TAG_MPI, MPI_COMM_WORLD, &mpiStatus);
 }
 
 // function for load data from file
 void loadNumbersFromFile(char *fileName) {
     int processorDestination = 0;
     fstream inputFile;
-    int readValue;
 
     inputFile.open(fileName, ios::in);
 
-    readValue = inputFile.get();
+    int  readValue = inputFile.get();
 
     while (readValue != EOF) {
         cout << readValue;
@@ -187,7 +184,7 @@ void initializeMPI(int argc, char **argv, int *infos) {
     MPI_Comm_size(MPI_COMM_WORLD, &infos[1]);
 }
 
-void lastOrderedAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValue, int &value, double start) {
+void lastOrderAndShowRootNode(MPI_Status &status, const int *mpiInfo, int &nValue, int &value, double start) {
     int orderedValues[mpiInfo[1]];
 
     for (int i = 1; i < mpiInfo[1]; i++) {
