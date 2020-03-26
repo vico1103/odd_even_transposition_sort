@@ -155,9 +155,9 @@ bool isFileExist(string &fileName) {
 // get Error message
 string getErrorMessage(int errorCode) {
     if (errorCode == ERROR_COUNT) {
-        return "`Wrong arguments or file does not exists";
+        return "Wrong arguments or file does not exists";
     } else {
-        return "Unkown error";
+        return "Unknown error";
     }
 }
 
